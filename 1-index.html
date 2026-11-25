@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ahmed Mohamed | Full Stack Web Developer</title>
+<meta name="description" content="Ahmed Mohamed - Full Stack Web Developer (MERN Stack). Building responsive web applications with React, Node.js, Express.js and MongoDB.">
+<script>
+  // Apply the saved theme before first paint so there is no flash of the wrong theme.
+  (function () {
+    var saved = localStorage.getItem("theme");
+    if (saved === "light" || saved === "dark") {
+      document.documentElement.setAttribute("data-theme", saved);
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Themes ---------- */
+  :root {
+    --bg: #0d1117;
+    --bg-soft: #161b22;
+    --card: #1a2230;
+    --border: #28323f;
+    --text: #e6edf3;
+    --muted: #9aa7b4;
+    --accent: #58a6ff;
+    --accent-soft: rgba(88, 166, 255, 0.12);
+    --accent-border: rgba(88, 166, 255, 0.3);
+    --green: #3fb950;
+    --yellow: #d29922;
+    --nav-bg: rgba(13, 17, 23, 0.85);
+    --btn-primary-text: #0d1117;
+    --pattern-opacity: 0.5;
+    --glow-opacity: 0.16;
+    --shadow: 0 6px 22px rgba(88, 166, 255, 0.35);
+    --radius: 14px;
+  }
+  [data-theme="light"] {
+    --bg: #f4f6fa;
+    --bg-soft: #ffffff;
+    --card: #ffffff;
+    --border: #d9e0ea;
+    --text: #1c2430;
+    --muted: #5a6675;
+    --accent: #2563eb;
+    --accent-soft: rgba(37, 99, 235, 0.08);
+    --accent-border: rgba(37, 99, 235, 0.25);
+    --green: #1a7f37;
+    --yellow: #9a6700;
+    --nav-bg: rgba(244, 246, 250, 0.85);
+    --btn-primary-text: #ffffff;
+    --pattern-opacity: 0.9;
+    --glow-opacity: 0.10;
+    --shadow: 0 6px 22px rgba(37, 99, 235, 0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* ---------- Background: inline SVG dot grid + soft accent glows (no external assets) ---------- */
+  body::before {
+    content: "";
+    position: fixed; inset: 0; z-index: -2;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Ccircle cx='2' cy='2' r='1.3' fill='%2358a6ff' fill-opacity='0.13'/%3E%3C/svg%3E");
+    opacity: var(--pattern-opacity);
+    pointer-events: none;
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0; z-index: -1;
+    background:
+      radial-gradient(600px 380px at 15% 8%, var(--accent) 0%, transparent 70%),
+      radial-gradient(700px 420px at 88% 30%, var(--accent) 0%, transparent 70%);
+    opacity: var(--glow-opacity);
+    pointer-events: none;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--nav-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s;
+  }
+  nav .container { display: flex; justify-content: space-between; align-items: center; height: 60px; }
+  nav .logo { font-weight: 700; font-size: 1.05rem; letter-spacing: 0.3px; }
+  nav .logo span { color: var(--accent); }
+  nav ul { display: flex; gap: 28px; list-style: none; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.92rem; font-weight: 500; transition: color 0.2s; }
+  nav a:hover { color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 18px; }
+  @media (max-width: 640px) { nav ul { display: none; } }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, background 0.3s;
+  }
+  .theme-toggle:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .theme-toggle svg { width: 18px; height: 18px; fill: none; stroke: var(--text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .theme-toggle .icon-sun { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  [data-theme="light"] .theme-toggle .icon-moon { display: none; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 80px 0; }
+  /* Card with the animated gradient border */
+  .hero-card {
+    position: relative;
+    border-radius: 20px;
+    background: var(--card);
+    padding: 56px 32px;
+    text-align: center;
+    transition: background 0.3s;
+  }
+  /* The border: a full-size layer behind the card, clipped to a 1.5px ring by mask-composite,
+     carrying a moving gradient. */
+  .hero-card::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: 20px;
+    padding: 1.5px;
+    background: linear-gradient(115deg, var(--accent), transparent 30%, transparent 70%, var(--accent));
+    background-size: 300% 300%;
+    animation: borderFlow 7s linear infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+  @keyframes borderFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-card::before { animation: none; }
+  }
+
+  .hero .eyebrow {
+    display: inline-block;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    padding: 6px 16px; border-radius: 999px;
+    margin-bottom: 24px;
+  }
+  .hero h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 800; letter-spacing: -1px; }
+  .hero h1 span { color: var(--accent); }
+  .hero .ar-tag {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.15rem; color: var(--muted); margin-top: 10px; font-weight: 500;
+  }
+  .hero .title-line { font-size: clamp(1.05rem, 2.5vw, 1.3rem); color: var(--muted); margin-top: 18px; font-weight: 400; }
+  .hero .title-line strong { color: var(--text); font-weight: 600; }
+  .hero .cta { margin-top: 36px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 12px 28px; border-radius: 10px;
+    font-weight: 600; font-size: 0.95rem; text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: var(--btn-primary-text); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .btn-ghost { border: 1px solid var(--border); color: var(--text); background: var(--bg-soft); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  /* ---------- Sections ---------- */
+  section { padding: 72px 0; border-top: 1px solid var(--border); }
+  .section-head { margin-bottom: 40px; }
+  .section-head .kicker { font-size: 0.78rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+  .section-head h2 { font-size: 1.8rem; font-weight: 700; margin-top: 6px; letter-spacing: -0.5px; }
+
+  /* About */
+  .about p { color: var(--muted); font-size: 1.02rem; max-width: 720px; }
+  .about p + p { margin-top: 14px; }
+  .about .stats { display: flex; gap: 32px; margin-top: 36px; flex-wrap: wrap; }
+  .stat .num { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+  .stat .lbl { font-size: 0.85rem; color: var(--muted); }
+
+  /* Skills */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .skill-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px;
+    transition: border-color 0.2s, transform 0.2s, background 0.3s;
+  }
+  .skill-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .skill-card h3 { font-size: 0.8rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    font-size: 0.82rem; font-weight: 500; color: var(--text);
+    background: var(--bg-soft); border: 1px solid var(--border);
+    padding: 4px 12px; border-radius: 999px;
+  }
+
+  /* Projects */
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+  .project-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 26px; display: flex; flex-direction: column;
+    transition: border-color 0.2s, transform 0.2s, background 0.3s;
+  }
+  .project-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+  .project-card .status {
+    align-self: flex-start;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .status.done { color: var(--green); background: rgba(63, 185, 80, 0.12); border: 1px solid rgba(63, 185, 80, 0.35); }
+  .status.wip { color: var(--yellow); background: rgba(210, 153, 34, 0.12); border: 1px solid rgba(210, 153, 34, 0.35); }
+  .project-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+  .project-card p { color: var(--muted); font-size: 0.93rem; flex-grow: 1; }
+  .project-card .tags { margin-top: 18px; }
+  .project-card .tag { font-size: 0.78rem; color: var(--accent); background: var(--accent-soft); border-color: var(--accent-border); }
+
+  /* Education */
+  .edu-list { display: grid; gap: 18px; }
+  .edu-item {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px 26px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap;
+    transition: background 0.3s;
+  }
+  .edu-item h3 { font-size: 1.05rem; font-weight: 600; }
+  .edu-item .org { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+  .edu-item .year {
+    font-size: 0.82rem; font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); border: 1px solid var(--accent-border);
+    padding: 4px 12px; border-radius: 999px; white-space: nowrap;
+  }
+  .training-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
+  .training-chip {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 18px; font-size: 0.92rem; font-weight: 500;
+    transition: background 0.3s;
+  }
+  .training-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .training-chip small { color: var(--muted); font-weight: 400; }
+
+  /* Contact */
+  .contact { text-align: center; }
+  .contact p { color: var(--muted); max-width: 520px; margin: 0 auto; }
+  .contact .links { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 32px; }
+  .contact-card {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 22px; text-decoration: none; color: var(--text); font-size: 0.93rem; font-weight: 500;
+    transition: border-color 0.2s, transform 0.2s, background 0.3s;
+  }
+  .contact-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .contact-card svg { width: 18px; height: 18px; fill: var(--accent); flex-shrink: 0; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--border);
+    background: var(--bg-soft);
+    transition: background 0.3s;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 32px;
+    padding: 48px 0 36px;
+  }
+  @media (max-width: 640px) { .footer-grid { grid-template-columns: 1fr; gap: 24px; } }
+  .footer-brand .logo { font-weight: 700; font-size: 1.05rem; }
+  .footer-brand .logo span { color: var(--accent); }
+  .footer-brand p { color: var(--muted); font-size: 0.88rem; margin-top: 10px; max-width: 260px; }
+  .footer-brand .ar { font-family: 'Tajawal', sans-serif; display: block; margin-top: 8px; color: var(--accent); font-size: 0.95rem; }
+  footer h4 {
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  .footer-contact a {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted); text-decoration: none; font-size: 0.92rem; font-weight: 500;
+    padding: 5px 0;
+    transition: color 0.2s;
+  }
+  .footer-contact a:hover { color: var(--accent); }
+  .footer-contact svg { width: 16px; height: 16px; fill: var(--accent); flex-shrink: 0; }
+  .footer-links a {
+    display: block; color: var(--muted); text-decoration: none; font-size: 0.92rem; padding: 5px 0;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding: 18px 0; text-align: center;
+    color: var(--muted); font-size: 0.83rem;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="logo">Ahmed<span>.</span>Mohamed</div>
+    <div class="nav-right">
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark and light mode" title="Toggle theme">
+        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-card">
+      <div class="eyebrow">Available for freelance &amp; junior roles</div>
+      <h1>Hi, I'm <span>Ahmed Mohamed</span></h1>
+      <div class="ar-tag" dir="rtl">مطوّر ويب بيبني أفكارك من الصفر لموقع شغّال</div>
+      <p class="title-line">Full Stack Web Developer &mdash; <strong>MERN Stack</strong> (MongoDB, Express, React, Node.js)</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#projects">View My Work</a>
+        <a class="btn btn-ghost" href="mailto:moahmedmohamed032@gmail.com">Get In Touch</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="about" class="about">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">About</div>
+      <h2>Turning ideas into working web apps</h2>
+    </div>
+    <p>Full Stack Web Developer with a background in Management Information Systems and ITI training in Software Fundamentals and the MERN stack. I practice through real projects: responsive web applications built with React, Node.js, Express.js, MongoDB, and GraphQL.</p>
+    <p>I'm comfortable with authentication and authorization, CRUD operations, and location-based features, and I have additional experience with PHP and MySQL. Before tech, I worked in real estate, retail, and accounting, so I know how to talk to clients, negotiate, and manage details under pressure.</p>
+    <div class="stats">
+      <div class="stat"><div class="num">5</div><div class="lbl">Projects built</div></div>
+      <div class="stat"><div class="num">10+</div><div class="lbl">Technologies</div></div>
+      <div class="stat"><div class="num">2</div><div class="lbl">ITI trainings</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">Skills</div>
+      <h2>What I work with</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <h3>Frontend</h3>
+        <div class="tags">
+          <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript (ES6+)</span>
+          <span class="tag">TypeScript</span><span class="tag">React.js</span><span class="tag">Next.js</span><span class="tag">Angular</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3>Backend</h3>
+        <div class="tags">
+          <span class="tag">Node.js</span><span class="tag">Express.js</span><span class="tag">NestJS</span>
+          <span class="tag">GraphQL</span><span class="tag">PHP</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3>Databases</h3>
+        <div class="tags">
+          <span class="tag">MongoDB</span><span class="tag">Mongoose</span><span class="tag">MySQL</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3>Core Concepts</h3>
+        <div class="tags">
+          <span class="tag">Authentication &amp; Authorization</span><span class="tag">CRUD Operations</span>
+          <span class="tag">Responsive Design</span><span class="tag">Geolocation</span><span class="tag">Docker (Basics)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">Projects</div>
+      <h2>Selected work</h2>
+    </div>
+    <div class="projects-grid">
+      <article class="project-card">
+        <span class="status done">Completed</span>
+        <h3>EduPath - Courses Website</h3>
+        <p>Course listing platform with live search, category filters, and a course detail modal. State-driven rendering and event delegation in vanilla JavaScript.</p>
+        <div class="tags">
+          <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span>
+        </div>
+      </article>
+      <article class="project-card">
+        <span class="status done">Completed</span>
+        <h3>Rock Paper Scissors Game</h3>
+        <p>Playable game against the computer with score tracking, round history, and reveal animations. Game logic built with classic switch statements.</p>
+        <div class="tags">
+          <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span>
+        </div>
+      </article>
+      <article class="project-card">
+        <span class="status done">Completed</span>
+        <h3>Hotel &amp; Flight Booking System</h3>
+        <p>Booking application supporting hotel and flight reservations with location-based features. Responsive UI with full authentication flows.</p>
+        <div class="tags">
+          <span class="tag">React</span><span class="tag">Node.js</span><span class="tag">Express</span>
+          <span class="tag">MongoDB</span><span class="tag">GraphQL</span>
+        </div>
+      </article>
+      <article class="project-card">
+        <span class="status done">Completed</span>
+        <h3>Stock Management System</h3>
+        <p>Inventory management application with user registration and login. Product CRUD for name, quantity, image, and brand, using sessions and cookies in the authentication flow.</p>
+        <div class="tags">
+          <span class="tag">PHP</span><span class="tag">PDO</span><span class="tag">MySQL</span>
+        </div>
+      </article>
+      <article class="project-card">
+        <span class="status wip">In Progress</span>
+        <h3>Home Services Marketplace</h3>
+        <p>A marketplace connecting customers with service technicians. Planned features include role-based access, technician registration with location handling, service bookings, and dashboards.</p>
+        <div class="tags">
+          <span class="tag">React</span><span class="tag">NestJS</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="education">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">Education &amp; Training</div>
+      <h2>My path into tech</h2>
+    </div>
+    <div class="edu-list">
+      <div class="edu-item">
+        <div>
+          <h3>Bachelor's Degree in Management Information Systems (MIS)</h3>
+          <div class="org">Shorouk Academy &mdash; Computer &amp; Information Sciences Institute, Administrative Information Systems Department</div>
+        </div>
+        <span class="year">2019</span>
+      </div>
+    </div>
+    <div class="training-row">
+      <div class="training-chip"><span class="dot"></span>ITI &mdash; Software Fundamentals <small>&middot; July 2025</small></div>
+      <div class="training-chip"><span class="dot"></span>ITI &mdash; Full Stack Web Development (MERN) <small>&middot; January 2026</small></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">Contact</div>
+      <h2>Let's build something together</h2>
+    </div>
+    <p>I'm open to freelance projects and junior developer roles. Based in Luxor, Egypt &mdash; working with clients anywhere.</p>
+    <div class="links">
+      <a class="contact-card" href="mailto:moahmedmohamed032@gmail.com">
+        <svg viewBox="0 0 24 24"><path d="M2 4h20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm10 8.7L3.6 6v13h16.8V6L12 12.7zM4.3 5.4 12 11l7.7-5.6H4.3z"/></svg>
+        moahmedmohamed032@gmail.com
+      </a>
+      <a class="contact-card" href="tel:+201092245837">
+        <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg>
+        +20 109 224 5837
+      </a>
+      <a class="contact-card" href="https://www.linkedin.com/in/ahmed-mohamed-405384395" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45z"/></svg>
+        LinkedIn
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">Ahmed<span>.</span>Mohamed</div>
+        <p>Full Stack Web Developer (MERN). I build responsive web apps from idea to launch, and I'm available for freelance work and junior roles.</p>
+        <span class="ar" dir="rtl">جاهز نشتغل سوا</span>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <div class="footer-contact">
+          <a href="mailto:moahmedmohamed032@gmail.com">
+            <svg viewBox="0 0 24 24"><path d="M2 4h20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm10 8.7L3.6 6v13h16.8V6L12 12.7zM4.3 5.4 12 11l7.7-5.6H4.3z"/></svg>
+            moahmedmohamed032@gmail.com
+          </a>
+          <a href="tel:+201092245837">
+            <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg>
+            +20 109 224 5837
+          </a>
+          <a href="https://www.linkedin.com/in/ahmed-mohamed-405384395" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45z"/></svg>
+            linkedin.com/in/ahmed-mohamed-405384395
+          </a>
+        </div>
+      </div>
+      <div>
+        <h4>Navigate</h4>
+        <div class="footer-links">
+          <a href="#about">About</a>
+          <a href="#skills">Skills</a>
+          <a href="#projects">Projects</a>
+          <a href="#education">Education</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Ahmed Mohamed &mdash; Luxor, Egypt</div>
+  </div>
+</footer>
+
+<script>
+  // Theme toggle: flip data-theme on <html> and remember the choice.
+  (function () {
+    var toggle = document.getElementById("theme-toggle");
+    toggle.addEventListener("click", function () {
+      var current = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+      var next = current === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("theme", next);
+    });
+  })();
+</script>
+
+</body>
+</html>
